@@ -5,23 +5,18 @@ import math
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-# 1. Initialize the TTS Speech Engine
+
 engine = pyttsx3.init()
 engine.setProperty('rate', 150) # Set speaking speed speed
 last_spoken = "" # Prevents repeating the same word constantly
 
 def calculate_distance(p1, p2):
-    """Calculates the Euclidean distance between two 3D landmarks."""
+    
     return math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2 + (p1.z - p2.z)**2)
 
 def recognize_sign(landmarks):
-    """
-    Decodes hand configurations by analyzing finger extension.
-    Compares fingertip distances relative to knuckle joints.
-    """
-    # Check if fingers are open (Fingertip distance to wrist vs Knuckle distance to wrist)
-    # MediaPipe Hand Landmarks: Thumb(4), Index(8), Middle(12), Ring(16), Pinky(20)
-    # Knuckle Landmarks: Thumb(2), Index(6), Middle(10), Ring(14), Pinky(18)
+    
+    
     
     wrist = landmarks[0]
     
@@ -31,7 +26,7 @@ def recognize_sign(landmarks):
     ring_open = calculate_distance(landmarks[16], wrist) > calculate_distance(landmarks[14], wrist)
     pinky_open = calculate_distance(landmarks[20], wrist) > calculate_distance(landmarks[18], wrist)
 
-    # Define Sign Rules
+    
     if index_open and middle_open and not ring_open and not pinky_open:
         return "Peace"
     elif index_open and not middle_open and not ring_open and pinky_open:
@@ -45,7 +40,7 @@ def recognize_sign(landmarks):
     
     return "Unknown"
 
-# 2. Configure MediaPipe Hand Landmarker
+
 base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
 options = vision.HandLandmarkerOptions(
     base_options=base_options,
@@ -71,15 +66,15 @@ with vision.HandLandmarker.create_from_options(options) as detector:
         
         if detection_result.hand_landmarks:
             for hand_landmarks in detection_result.hand_landmarks:
-                # Get the string meaning of the current hand pose
+                
                 current_sign = recognize_sign(hand_landmarks)
                 
-                # Render dots on screen
+                
                 for landmark in hand_landmarks:
                     cx, cy = int(landmark.x * w), int(landmark.y * h)
                     cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
                 
-                # Print and Speak the sign if it is new
+                
                 cv2.putText(frame, f"Sign: {current_sign}", (30, 50), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                 
